@@ -12,16 +12,16 @@ function Shell({title,subtitle,profile,onLogout,children,onNavigate,active,count
 
 
 function MessagePanel({profile,members}) {
-  const [selected,setSelected]=useState(null),[messages,setMessages]=useState([]),[text,setText]=useState(''),[unread,setUnread]=useState(0),[notice,setNotice]=useState('');
+  const [selected,setSelected]=useState(null),[messages,setMessages]=useState([]),[text,setText]=useState(''),[unread,setUnread]=useState(0),[notice,setNotice]=useState(''),[adminTargets,setAdminTargets]=useState([]);
   const isAdmin=profile.role==='admin';
-  const targets=isAdmin?members.filter(m=>m.id!==profile.id):members.filter(m=>m.role==='admin');
+  const targets=isAdmin?members.filter(m=>m.id!==profile.id):adminTargets;
   async function refresh(){
     const {data,error}=await supabase.from('messages').select('*').or('sender_id.eq.'+profile.id+',recipient_id.eq.'+profile.id).order('created_at',{ascending:true});
     if(error){setNotice(error.message);return}
     setMessages(data||[]);
     setUnread((data||[]).filter(m=>m.recipient_id===profile.id&&!m.read_at).length);
   }
-  useEffect(()=>{refresh();const timer=setInterval(refresh,5000);return()=>clearInterval(timer)},[profile.id]);
+  useEffect(()=>{refresh();if(!isAdmin)supabase.from('profiles').select('id,name,email,role').eq('role','admin').order('created_at',{ascending:true}).then(({data,error})=>{if(error)setNotice(error.message);setAdminTargets(data||[])});const timer=setInterval(refresh,5000);return()=>clearInterval(timer)},[profile.id,isAdmin]);
   async function openChat(id){
     setSelected(id);
     const {data,error}=await supabase.from('messages').select('*').or('and(sender_id.eq.'+profile.id+',recipient_id.eq.'+id+'),and(sender_id.eq.'+id+',recipient_id.eq.'+profile.id+')').order('created_at',{ascending:true});
