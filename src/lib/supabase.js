@@ -1,0 +1,2 @@
+import { createClient } from '@supabase/supabase-js'
+export const supabase=createClient('https://lghhhnbaqemyjmaghwfi.supabase.co','sb_publishable_jhJVNc4hqjrtHM4sVzUioQ_m4FwszHH',{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}})
