@@ -12,7 +12,7 @@ function Shell({title,subtitle,profile,onLogout,children,onNavigate,active,count
 
 
 function MessagePanel({profile,members}) {
-  const [selected,setSelected]=useState(null),[messages,setMessages]=useState([]),[text,setText]=useState(''),[unread,setUnread]=useState(0),[notice,setNotice]=useState(''),[adminTargets,setAdminTargets]=useState([]);
+  const [selected,setSelected]=useState(null),[messages,setMessages]=useState([]),[text,setText]=useState(''),[unread,setUnread]=useState(0),[notice,setNotice]=useState(''),[adminTargets,setAdminTargets]=useState([]),[deleteMode,setDeleteMode]=useState(false);
   const isAdmin=profile.role==='admin';
   const targets=isAdmin?members.filter(m=>m.id!==profile.id):adminTargets;
   async function refresh(){
@@ -31,6 +31,7 @@ function MessagePanel({profile,members}) {
     if(ids.length)await supabase.from('messages').update({read_at:new Date().toISOString()}).in('id',ids);
     refresh();
   }
+  async function deleteMessage(id){const {error}=await supabase.from('messages').delete().eq('id',id);if(error){setNotice(error.message);return}setMessages(m=>m.filter(x=>x.id!==id))}
   async function send(to){
     if(!to||!text.trim())return;
     const {error}=await supabase.from('messages').insert({sender_id:profile.id,recipient_id:to,body:text.trim()});
@@ -61,7 +62,7 @@ function MessagePanel({profile,members}) {
         </div>
         <div className="message-chat">
           {selected==='all'?<><div className="chat-header"><strong>All Team Members</strong><small>Send one message to every member.</small></div><div className="chat-empty">Compose an announcement for the whole team.</div><div className="message-compose"><textarea value={text} onChange={e=>setText(e.target.value)} placeholder="Write a message to everyone..." rows="2"/><button className="primary" disabled={!text.trim()||!targets.length} onClick={sendAll}>Send to All</button></div></>:
-          selected?<><div className="chat-header"><strong>{current?.name}</strong><small>{current?.email}</small></div><div className="chat-messages">{conversation.map(m=><div key={m.id} className={'chat-bubble '+(m.sender_id===profile.id?'mine':'theirs')}><p>{m.body}</p><small>{new Date(m.created_at).toLocaleString()}</small></div>)}</div><div className="message-compose"><textarea value={text} onChange={e=>setText(e.target.value)} placeholder="Write a message..." rows="2"/><button className="primary" disabled={!text.trim()} onClick={()=>send(selected)}>Send</button></div></>:<div className="chat-empty">Select a team member to start a private chat.</div>}
+          selected?<><div className="chat-header"><strong>{current?.name}</strong><small>{current?.email}</small></div><div className="chat-messages">{conversation.map(m=><div key={m.id} className={'chat-bubble '+(m.sender_id===profile.id?'mine':'theirs')}><p>{m.body}</p><small>{new Date(m.created_at).toLocaleString()}</small><button className="message-delete" type="button" onClick={()=>deleteMessage(m.id)}>Delete</button></div>)}</div><div className="message-compose"><textarea value={text} onChange={e=>setText(e.target.value)} placeholder="Write a message..." rows="2"/><button className="primary" disabled={!text.trim()} onClick={()=>send(selected)}>Send</button></div></>:<div className="chat-empty">Select a team member to start a private chat.</div>}
         </div>
       </div>
       :
