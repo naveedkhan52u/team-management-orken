@@ -38,3 +38,5 @@
 .status.paused{background:#fef3c7;color:#92400e;border-color:#f59e0b}
 
 .change-request{margin-top:10px;padding:9px 10px;border-left:3px solid #f59e0b;background:#fffbeb;border-radius:6px;color:#78350f;font-size:11px}.change-request strong{display:block;font-size:10px;margin-bottom:4px}.change-request p{margin:0;line-height:1.45;white-space:pre-wrap}
+
+.change-menu-btn{font-size:8px}
