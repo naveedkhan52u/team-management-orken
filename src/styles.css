@@ -40,3 +40,7 @@
 .change-request{margin-top:10px;padding:9px 10px;border-left:3px solid #f59e0b;background:#fffbeb;border-radius:6px;color:#78350f;font-size:11px}.change-request strong{display:block;font-size:10px;margin-bottom:4px}.change-request p{margin:0;line-height:1.45;white-space:pre-wrap}
 
 .change-menu-btn{font-size:8px}
+
+
+/* Member task comments */
+.member-comment{margin-top:12px;padding:10px;border:1px solid #e2e8f0;border-radius:9px;background:#f8fafc}.member-comment-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}.member-comment-head strong{font-size:10px;color:#475569}.member-comment textarea{font-size:11px;min-height:70px}.member-comment-actions{display:flex;justify-content:flex-end;gap:7px;margin-top:7px}.member-comment-actions .primary,.member-comment-actions .secondary{font-size:10px;padding:6px 9px}.member-comment>p{margin:0;font-size:11px;line-height:1.5;color:#475569;white-space:pre-wrap;overflow-wrap:anywhere}.admin-member-comment{margin-top:7px;padding:7px 9px;border-left:3px solid #2563eb;background:#f8fbff;border-radius:5px}.admin-member-comment strong{display:block;font-size:9px;color:#1d4ed8;margin-bottom:3px}.admin-member-comment p{margin:0;font-size:10px;line-height:1.4;color:#475569;white-space:pre-wrap;overflow-wrap:anywhere;max-width:260px}
