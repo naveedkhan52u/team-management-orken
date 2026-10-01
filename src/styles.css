@@ -83,3 +83,8 @@
 .advance-row strong{font-size:11px}
 @media(max-width:900px){.salary-summary-grid{grid-template-columns:repeat(2,1fr)}.salary-grid{grid-template-columns:1fr}}
 @media(max-width:620px){.salary-toolbar{grid-template-columns:1fr}.salary-summary-grid{grid-template-columns:1fr}.salary-form,.salary-grid .panel:nth-child(2) .salary-form,.salary-grid .panel:nth-child(4) .salary-form{grid-template-columns:1fr}.advance-row{grid-template-columns:1fr auto}.advance-row .danger-btn{grid-column:1/-1;justify-self:start}}
+
+.notice.success-notice{background:#ecfdf3;border:1px solid #bbf7d0;color:#166534}
+.notice.success-notice button{color:#166534}
+.notice.error-notice{background:#fff0f0;border:1px solid #ffd3d3;color:#b42318}
+.notice.error-notice button{color:#b42318}
