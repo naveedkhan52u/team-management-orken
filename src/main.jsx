@@ -32,7 +32,7 @@ function SalaryManagement({members}){
   const [salary,setSalary]=useState([]),[attendance,setAttendance]=useState([]),[advances,setAdvances]=useState([]);
   const [selectedMember,setSelectedMember]=useState(''),[month,setMonth]=useState(new Date().getMonth()+1),[year,setYear]=useState(new Date().getFullYear());
   const [monthlySalary,setMonthlySalary]=useState(''),[date,setDate]=useState(new Date().toISOString().slice(0,10)),[attStatus,setAttStatus]=useState('present');
-  const [advanceAmount,setAdvanceAmount]=useState(''),[advanceNote,setAdvanceNote]=useState(''),[message,setMessage]=useState('');
+  const [advanceAmount,setAdvanceAmount]=useState(''),[advanceNote,setAdvanceNote]=useState(''),[message,setMessage]=useState(''),[messageType,setMessageType]=useState('success');
   const membersOnly=members.filter(m=>m.role==='member');
   async function load(){
     const [{data:s},{data:a},{data:av}]=await Promise.all([
@@ -57,27 +57,27 @@ function SalaryManagement({members}){
     e.preventDefault();if(!selectedMember)return;
     const value=Number(monthlySalary);if(!Number.isFinite(value)||value<0)return setMessage('Enter a valid monthly salary.');
     const {error}=await supabase.from('member_salary').upsert({member_id:selectedMember,monthly_salary:value,effective_from:new Date().toISOString().slice(0,10),updated_at:new Date().toISOString()},{onConflict:'member_id'});
-    if(error)return setMessage(error.message);setMessage('Salary saved.');setMonthlySalary('');load();
+    if(error){setMessageType('error');return setMessage(error.message)}setMessageType('success');setMessage('Salary saved.');setMonthlySalary('');load();
   }
   async function saveAttendance(e){
     e.preventDefault();if(!selectedMember||!date)return;
     const {error}=await supabase.from('attendance').upsert({member_id:selectedMember,attendance_date:date,status:attStatus,updated_at:new Date().toISOString()},{onConflict:'member_id,attendance_date'});
-    if(error)return setMessage(error.message);setMessage('Attendance saved.');load();
+    if(error){setMessageType('error');return setMessage(error.message)}setMessageType('success');setMessage('Attendance saved.');load();
   }
   async function addAdvance(e){
     e.preventDefault();if(!selectedMember)return;
     const value=Number(advanceAmount);if(!Number.isFinite(value)||value<=0)return setMessage('Enter a valid advance amount.');
     const {error}=await supabase.from('salary_advances').insert({member_id:selectedMember,amount:value,advance_date:date, note:advanceNote.trim()||null});
-    if(error)return setMessage(error.message);setMessage('Advance added.');setAdvanceAmount('');setAdvanceNote('');load();
+    if(error){setMessageType('error');return setMessage(error.message)}setMessageType('success');setMessage('Advance added.');setAdvanceAmount('');setAdvanceNote('');load();
   }
   async function deleteAdvance(id){if(!confirm('Delete this salary advance?'))return;const{error}=await supabase.from('salary_advances').delete().eq('id',id);if(error)return setMessage(error.message);load()}
   async function savePeriod(){
     if(!selectedMember)return;
     const {error}=await supabase.from('salary_periods').upsert({member_id:selectedMember,month:Number(month),year:Number(year),monthly_salary:Number(currentSalary),absent_days:absent,absence_deduction:deduction,total_advance:totalAdvance,final_salary:finalSalary,updated_at:new Date().toISOString()},{onConflict:'member_id,month,year'});
-    if(error)return setMessage(error.message);setMessage('Salary period saved.');
+    if(error){setMessageType('error');return setMessage(error.message)}setMessageType('success');setMessage('Salary period saved.');
   }
   return <section className="salary-management">
-    {message&&<div className="notice">{message}<button onClick={()=>setMessage('')}>×</button></div>}
+    {message&&<div className={'notice '+(messageType==='error'?'error-notice':'success-notice')}>{message}<button onClick={()=>setMessage('')}>×</button></div>}
     <div className="salary-toolbar"><label>Member<select value={selectedMember} onChange={e=>setSelectedMember(e.target.value)}><option value="">Select member</option>{membersOnly.map(m=><option key={m.id} value={m.id}>{m.name}</option>)}</select></label><label>Month<select value={month} onChange={e=>setMonth(e.target.value)}>{Array.from({length:12},(_,i)=><option key={i+1} value={i+1}>{new Date(2000,i,1).toLocaleString('en',{month:'long'})}</option>)}</select></label><label>Year<input type="number" value={year} onChange={e=>setYear(e.target.value)}/></label></div>
     {!selected?<div className="empty">Select a team member to manage salary, attendance, and advances.</div>:<><div className="salary-summary-grid"><div className="salary-card"><span>Monthly Salary</span><strong>Rs. {Number(currentSalary).toLocaleString()}</strong></div><div className="salary-card"><span>Daily Rate</span><strong>Rs. {rate.toFixed(2)}</strong></div><div className="salary-card"><span>Absence Deduction</span><strong>Rs. {deduction.toFixed(2)}</strong></div><div className="salary-card"><span>Final Payable</span><strong>Rs. {finalSalary.toFixed(2)}</strong></div></div>
     <div className="salary-grid">
